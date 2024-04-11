@@ -9,7 +9,7 @@ import random
 import os
 from torch import nn
 
-from transformers import AdamW,  \
+from transformers import \
     get_linear_schedule_with_warmup
 from transformers.optimization import get_linear_schedule_with_warmup
 from sklearn.model_selection import KFold
@@ -53,7 +53,7 @@ parser.add_argument('--modelId', default='0', type=int)
 # model: 模型类的名称，必须与MODEL_CLASSES中的键一致
 parser.add_argument(
         "--model",
-        default='BertLastFourCls',
+        default='BertForClass',
         type=str,
     )
 # Stratification: 是否使用分层采样，分层采样的意思是在划分训练集和验证集时，每个类别的样本数量比例与原始数据集中的比例相同
@@ -96,13 +96,13 @@ parser.add_argument(
 # 一个epoch包含的批次数 = 训练集样本数 / batch_size
 parser.add_argument(
         "--batch_size",
-        default=64,
+        default=32,
         type=int,
     )
 # k_fold: k折交叉验证的折数
 parser.add_argument(
         "--k_fold",
-        default=5,
+        default=3,
         type=int,
     )
 # seed: 随机种子，用于生成随机数，保证实验的可重复性
@@ -116,12 +116,6 @@ parser.add_argument(
         "--pgd",
         default=False,
         type=bool,
-    )
-# train_path: 训练集的路径
-parser.add_argument(
-        "--train_path",
-        default="data/labeled_data_test.csv",
-        type=str,
     )
 # weight_list: 类别权重列表，用于处理样本不均衡问题
 parser.add_argument(
@@ -190,20 +184,24 @@ train = pd.read_csv('data/labeled_data_test.csv')
 # 加载测试集
 test = pd.read_csv('data/test_data_test.csv')
 # 加载提交样例
-sub = pd.read_csv('data/submit_example.csv')
+sub = pd.read_csv('data/submit_example_test.csv')
 
 # 提取训练集和测试集的文本内容，确保文本内容的数据类型为字符串
 train_content = train['content'].values.astype(str)
 test_content = test['content'].values.astype(str)
 
-# 假设class_label是以逗号分隔的字符串
+# 假设class_label是以分号分隔的字符串
 def parse_labels(label_str):
-    """将逗号分隔的标签字符串转换为标签列表"""
-    return label_str.split(',')
+    """将分号分隔的标签字符串转换为标签列表"""
+    return label_str.split(';')
 
 # 应用解析函数到每个class_label上
 train_labels = train['class_label'].apply(parse_labels)
-categories = ["个人基本信息", "个人身份信息", "网络身份标识信息", "个人健康生理信息", "个人教育信息", "个人工作信息", "个人财产信息", "身份鉴别信息", "个人通信信息", "个人上网信息", "个人设备信息", "个人位置信息", "个人标签信息"]
+# 个人
+categories = ["基本", "身份", "网络标识", 
+              "健康", "教育", "工作", 
+              "金融", "身份鉴别", "通信", 
+              "网络行为", "设备", "位置", "标签"]
 
 # 创建类别到索引的映射
 category_to_index = {category: index for index, category in enumerate(categories)}
@@ -293,7 +291,7 @@ for fold, (train_index, valid_index) in enumerate(kf.split(np.arange(len(train_l
         ]
 
     # 使用AdamW优化器，学习率为config.learn_rate，这种方式比传统的Adam优化器更好地处理了权重衰减
-    optimizer = AdamW(optimizer_parameters, lr=config.learn_rate)
+    optimizer = torch.optim.AdamW(optimizer_parameters, lr=config.learn_rate)
     
     # 配置学习率调度器，采用带预热的学习率调度器，预热步数为训练集样本数的一半，总共训练步数为num_train_steps
     # 预热阶段学习率逐渐增加，然后保持不变，最后学习率逐渐减小，有助于模型更快地收敛
@@ -334,7 +332,10 @@ for fold, (train_index, valid_index) in enumerate(kf.split(np.arange(len(train_l
             input_ids = torch.tensor(input_ids).to(config.device)
             input_masks = torch.tensor(input_masks).to(config.device)
             segment_ids = torch.tensor(segment_ids).to(config.device)
-            label_t = torch.tensor(labels, dtype=torch.float).to(config.device)
+            # 首先将labels列表转换为一个numpy数组
+            labels_np = np.array(labels)
+            # 然后将这个numpy数组转换为torch.tensor
+            label_t = torch.tensor(labels_np, dtype=torch.float).to(config.device)
 
             # 模型的前向传播，得到预测结果y_pred
             y_pred = model(input_ids, input_masks, segment_ids)
@@ -411,7 +412,10 @@ for fold, (train_index, valid_index) in enumerate(kf.split(np.arange(len(train_l
                 input_ids = torch.tensor(input_ids).to(config.device)
                 input_masks = torch.tensor(input_masks).to(config.device)
                 segment_ids = torch.tensor(segment_ids).to(config.device)
-                label_t = torch.tensor(labels).to(config.device)
+                # 首先将labels列表转换为一个numpy数组
+                labels_np = np.array(labels)
+                # 然后将这个numpy数组转换为torch.tensor
+                label_t = torch.tensor(labels_np, dtype=torch.float).to(config.device)
 
                 # 模型的前向传播，得到预测结果y_pred
                 y_pred = model(input_ids, input_masks, segment_ids)
@@ -496,7 +500,7 @@ if not os.path.exists(save_result_path):
     os.makedirs(save_result_path)
 
 # 假设设置阈值为0.7
-threshold = 0.7
+threshold = 0.2
 # 初始化一个空列表用于存储每个样本的标签列表
 predicted_labels = []
 
@@ -507,8 +511,8 @@ for i in range(oof_test.shape[0]):
     labels = [categories[index] for index, value in enumerate(sample_pred) if value >= threshold]
     predicted_labels.append(labels)
 
-# 将预测的标签列表转换为字符串格式，以逗号分隔，用于提交
-sub['class_label'] = [','.join(label_list) for label_list in predicted_labels]
+# 将预测的标签列表转换为字符串格式，以分号分隔，用于提交
+sub['class_label'] = [';'.join(label_list) for label_list in predicted_labels]
 
 # 将预测结果保存到csv文件中，这个结果只包含了预测的类别名称
 sub.to_csv("./result/result{}_original.csv".format(config.modelId), index=False)

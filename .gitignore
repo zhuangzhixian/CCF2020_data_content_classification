@@ -3,5 +3,4 @@ chinese_roberta_wwm_ext_pytorch/
 train_test.log
 train.log
 models/
-data/
-results/
+result/

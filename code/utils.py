@@ -17,10 +17,8 @@ class data_generator:
         # shuffle是是否打乱数据
         self.shuffle = shuffle
         
-        # 确定词汇表文件名，BERT模型的词汇表文件名是vocab.txt，XLNet模型的词汇表文件名是spiece.model
-        vocab = 'vocab.txt' if os.path.exists(config.model_path + 'vocab.txt') else 'spiece.model'
         # 加载对应的分词器
-        self.tokenizer = TOKENIZERS[config.model].from_pretrained(config.model_path + vocab)
+        self.tokenizer = TOKENIZERS[config.model].from_pretrained(config.model_path)
 
         # 计算每个epoch的批次数
         self.steps = len(self.data[0]) // self.batch_size

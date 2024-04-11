@@ -11,8 +11,8 @@ res = []
 # 读取所有预测结果文件
 for file in files:
     tmp = pd.read_csv(directory + file)
-    # 假设class_label列的每个元素是以逗号分隔的多个类别
-    labels = tmp["class_label"].apply(lambda x: x.split(','))
+    # 假设class_label列的每个元素是分号分隔的多个类别
+    labels = tmp["class_label"].apply(lambda x: x.split(';'))
     res.append(labels)
 
 # 获取类别的总数

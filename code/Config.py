@@ -1,5 +1,5 @@
-from transformers import BertTokenizer, AdamW, BertModel, BertPreTrainedModel, BertConfig, \
-    get_linear_schedule_with_warmup, XLNetModel, XLNetTokenizer, XLNetConfig, ElectraModel, ElectraConfig, ElectraTokenizer
+from transformers import BertTokenizer, BertModel, BertConfig, \
+    XLNetModel, XLNetTokenizer, XLNetConfig, ElectraModel, ElectraConfig, ElectraTokenizer
 
 MODELS = {
     'BertForClass':  BertModel,

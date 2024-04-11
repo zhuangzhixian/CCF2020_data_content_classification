@@ -15,13 +15,10 @@ class BertForClass(nn.Module):
         super(BertForClass, self).__init__()
         # 设置模型需要预测的类别数，从传入的config中获取
         self.n_classes = config.num_class
-        # 读取模型的配置文件，如果模型路径下有bert_config.json文件，则读取该文件，否则读取config.json文件
-        config_json = 'bert_config.json' if os.path.exists(config.model_path + 'bert_config.json') else 'config.json'
         # 加载BERT模型的配置，CONFIGS是一个映射，根据传入的模型名字，获取对应的配置类
-        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path + config_json,
-                                                                 output_hidden_states=True) # output_hidden_states=True表示输出所有隐藏层的状态
+        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path)
         # 加载BERT模型，MODELS是一个映射，根据传入的模型名字，获取对应的模型类
-        self.bert_model = MODELS[config.model].from_pretrained(config.model_path, config=self.bert_config)
+        self.bert_model = MODELS[config.model].from_pretrained(config.model_path)
         # 根据config中的dropout参数，判断是否使用dropout
         self.isDropout = True if 0 < config.dropout < 1 else False
         # 创建了一个dropout层，如果使用dropout，则在模型的输出后加入dropout层
@@ -58,13 +55,10 @@ class BertForClass_MultiDropout(nn.Module):
         super(BertForClass_MultiDropout, self).__init__()
         # 设置模型需要预测的类别数，从传入的config中获取
         self.n_classes = config.num_class
-        # 读取模型的配置文件，如果模型路径下有bert_config.json文件，则读取该文件，否则读取config.json文件
-        config_json = 'bert_config.json' if os.path.exists(config.model_path + 'bert_config.json') else 'config.json'
         # 加载BERT模型的配置，CONFIGS是一个映射，根据传入的模型名字，获取对应的配置类
-        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path + config_json,
-                                                                 output_hidden_states=True) # output_hidden_states=True表示输出所有隐藏层的状态
+        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path)
         # 加载BERT模型，MODELS是一个映射，根据传入的模型名字，获取对应的模型类
-        self.bert_model = MODELS[config.model].from_pretrained(config.model_path, config=self.bert_config)
+        self.bert_model = MODELS[config.model].from_pretrained(config.model_path)
         # 定义多个dropout层，数量为5
         self.multi_drop = 5
         # 包含了5个dropout层的模块列表，每个层的dropout概率都是config中的dropout参数
@@ -103,12 +97,10 @@ class BertLastTwoCls(nn.Module):
         super(BertLastTwoCls, self).__init__()
         # 设置模型需要预测的类别数，从传入的config中获取
         self.n_classes = config.num_class
-        # 读取模型的配置文件，如果模型路径下有bert_config.json文件，则读取该文件，否则读取config.json文件
-        config_json = 'bert_config.json' if os.path.exists(config.model_path + 'bert_config.json') else 'config.json'
-        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path + config_json,
-                                                                 output_hidden_states=True) # output_hidden_states=True表示输出所有隐藏层的状态
+        # 加载BERT模型的配置，CONFIGS是一个映射，根据传入的模型名字，获取对应的配置类
+        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path)
         # 加载BERT模型，MODELS是一个映射，根据传入的模型名字，获取对应的模型类
-        self.bert_model = MODELS[config.model].from_pretrained(config.model_path, config=self.bert_config)
+        self.bert_model = MODELS[config.model].from_pretrained(config.model_path)
         # 根据config中的dropout参数，判断是否使用dropout
         self.isDropout = True if 0 < config.dropout < 1 else False
         # 创建了一个dropout层，如果使用dropout，则在模型的输出后加入dropout层
@@ -141,12 +133,10 @@ class BertLastTwoClsPooler(nn.Module):
         super(BertLastTwoClsPooler, self).__init__()
         # 设置模型需要预测的类别数，从传入的config中获取
         self.n_classes = config.num_class
-        # 读取模型的配置文件，如果模型路径下有bert_config.json文件，则读取该文件，否则读取config.json文件
-        config_json = 'bert_config.json' if os.path.exists(config.model_path + 'bert_config.json') else 'config.json'
-        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path + config_json,
-                                                                 output_hidden_states=True) # output_hidden_states=True表示输出所有隐藏层的状态
+        # 加载BERT模型的配置，CONFIGS是一个映射，根据传入的模型名字，获取对应的配置类
+        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path)
         # 加载BERT模型，MODELS是一个映射，根据传入的模型名字，获取对应的模型类
-        self.bert_model = MODELS[config.model].from_pretrained(config.model_path, config=self.bert_config)
+        self.bert_model = MODELS[config.model].from_pretrained(config.model_path)
         # 根据config中的dropout参数，判断是否使用dropout
         self.isDropout = True if 0 < config.dropout < 1 else False
         # 创建了一个dropout层，如果使用dropout，则在模型的输出后加入dropout层
@@ -181,12 +171,10 @@ class BertLastTwoEmbeddings(nn.Module):
         super(BertLastTwoEmbeddings, self).__init__()
         # 设置模型需要预测的类别数，从传入的config中获取
         self.n_classes = config.num_class
-        # 读取模型的配置文件，如果模型路径下有bert_config.json文件，则读取该文件，否则读取config.json文件
-        config_json = 'bert_config.json' if os.path.exists(config.model_path + 'bert_config.json') else 'config.json'
-        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path + config_json,
-                                                                 output_hidden_states=True) # output_hidden_states=True表示输出所有隐藏层的状态
+        # 加载BERT模型的配置，CONFIGS是一个映射，根据传入的模型名字，获取对应的配置类
+        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path)
         # 加载BERT模型，MODELS是一个映射，根据传入的模型名字，获取对应的模型类
-        self.bert_model = MODELS[config.model].from_pretrained(config.model_path, config=self.bert_config)
+        self.bert_model = MODELS[config.model].from_pretrained(config.model_path)
         # 根据config中的dropout参数，判断是否使用dropout
         self.isDropout = True if 0 < config.dropout < 1 else False
         # 创建了一个dropout层，如果使用dropout，则在模型的输出后加入dropout层
@@ -224,12 +212,10 @@ class BertLastTwoEmbeddingsPooler(nn.Module):
         super(BertLastTwoEmbeddingsPooler, self).__init__()
         # 设置模型需要预测的类别数，从传入的config中获取
         self.n_classes = config.num_class
-        # 读取模型的配置文件，如果模型路径下有bert_config.json文件，则读取该文件，否则读取config.json文件
-        config_json = 'bert_config.json' if os.path.exists(config.model_path + 'bert_config.json') else 'config.json'
-        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path + config_json,
-                                                                 output_hidden_states=True) # output_hidden_states=True表示输出所有隐藏层的状态
+        # 加载BERT模型的配置，CONFIGS是一个映射，根据传入的模型名字，获取对应的配置类
+        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path)
         # 加载BERT模型，MODELS是一个映射，根据传入的模型名字，获取对应的模型类
-        self.bert_model = MODELS[config.model].from_pretrained(config.model_path, config=self.bert_config)
+        self.bert_model = MODELS[config.model].from_pretrained(config.model_path)
         # 根据config中的dropout参数，判断是否使用dropout
         self.isDropout = True if 0 < config.dropout < 1 else False
         # 创建了一个dropout层，如果使用dropout，则在模型的输出后加入dropout层
@@ -270,12 +256,10 @@ class BertLastFourCls(nn.Module):
         super(BertLastFourCls, self).__init__()
         # 设置模型需要预测的类别数，从传入的config中获取
         self.n_classes = config.num_class
-        # 读取模型的配置文件，如果模型路径下有bert_config.json文件，则读取该文件，否则读取config.json文件
-        config_json = 'bert_config.json' if os.path.exists(config.model_path + 'bert_config.json') else 'config.json'
-        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path + config_json,
-                                                                 output_hidden_states=True) # output_hidden_states=True表示输出所有隐藏层的状态
+        # 加载BERT模型的配置，CONFIGS是一个映射，根据传入的模型名字，获取对应的配置类
+        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path)
         # 加载BERT模型，MODELS是一个映射，根据传入的模型名字，获取对应的模型类
-        self.bert_model = MODELS[config.model].from_pretrained(config.model_path, config=self.bert_config)
+        self.bert_model = MODELS[config.model].from_pretrained(config.model_path)
         # 根据config中的dropout参数，判断是否使用dropout
         self.isDropout = True if 0 < config.dropout < 1 else False
         # 创建了一个dropout层，如果使用dropout，则在模型的输出后加入dropout层
@@ -308,12 +292,10 @@ class BertLastFourClsPooler(nn.Module):
         super(BertLastFourClsPooler, self).__init__()
         # 设置模型需要预测的类别数，从传入的config中获取
         self.n_classes = config.num_class
-        # 读取模型的配置文件，如果模型路径下有bert_config.json文件，则读取该文件，否则读取config.json文件
-        config_json = 'bert_config.json' if os.path.exists(config.model_path + 'bert_config.json') else 'config.json'
-        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path + config_json,
-                                                                 output_hidden_states=True) # output_hidden_states=True表示输出所有隐藏层的状态
+        # 加载BERT模型的配置，CONFIGS是一个映射，根据传入的模型名字，获取对应的配置类
+        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path)
         # 加载BERT模型，MODELS是一个映射，根据传入的模型名字，获取对应的模型类
-        self.bert_model = MODELS[config.model].from_pretrained(config.model_path, config=self.bert_config)
+        self.bert_model = MODELS[config.model].from_pretrained(config.model_path)
         # 根据config中的dropout参数，判断是否使用dropout
         self.isDropout = True if 0 < config.dropout < 1 else False
         # 创建了一个dropout层，如果使用dropout，则在模型的输出后加入dropout层
@@ -348,12 +330,10 @@ class BertLastFourEmbeddings(nn.Module):
         super(BertLastFourEmbeddings, self).__init__()
         # 设置模型需要预测的类别数，从传入的config中获取
         self.n_classes = config.num_class
-        # 读取模型的配置文件，如果模型路径下有bert_config.json文件，则读取该文件，否则读取config.json文件
-        config_json = 'bert_config.json' if os.path.exists(config.model_path + 'bert_config.json') else 'config.json'
-        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path + config_json,
-                                                                 output_hidden_states=True) # output_hidden_states=True表示输出所有隐藏层的状态
+        # 加载BERT模型的配置，CONFIGS是一个映射，根据传入的模型名字，获取对应的配置类
+        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path)
         # 加载BERT模型，MODELS是一个映射，根据传入的模型名字，获取对应的模型类
-        self.bert_model = MODELS[config.model].from_pretrained(config.model_path, config=self.bert_config)
+        self.bert_model = MODELS[config.model].from_pretrained(config.model_path)
         # 根据config中的dropout参数，判断是否使用dropout
         self.isDropout = True if 0 < config.dropout < 1 else False
         # 创建了一个dropout层，如果使用dropout，则在模型的输出后加入dropout层
@@ -393,12 +373,10 @@ class BertLastFourEmbeddingsPooler(nn.Module):
         super(BertLastFourEmbeddingsPooler, self).__init__()
         # 设置模型需要预测的类别数，从传入的config中获取
         self.n_classes = config.num_class
-        # 读取模型的配置文件，如果模型路径下有bert_config.json文件，则读取该文件，否则读取config.json文件
-        config_json = 'bert_config.json' if os.path.exists(config.model_path + 'bert_config.json') else 'config.json'
-        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path + config_json,
-                                                                 output_hidden_states=True) # output_hidden_states=True表示输出所有隐藏层的状态
+        # 加载BERT模型的配置，CONFIGS是一个映射，根据传入的模型名字，获取对应的配置类
+        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path)
         # 加载BERT模型，MODELS是一个映射，根据传入的模型名字，获取对应的模型类
-        self.bert_model = MODELS[config.model].from_pretrained(config.model_path, config=self.bert_config)
+        self.bert_model = MODELS[config.model].from_pretrained(config.model_path)
         # 根据config中的dropout参数，判断是否使用dropout
         self.isDropout = True if 0 < config.dropout < 1 else False
         # 创建了一个dropout层，如果使用dropout，则在模型的输出后加入dropout层
@@ -440,12 +418,10 @@ class BertDynCls(nn.Module):
         super(BertDynCls, self).__init__()
         # 设置模型需要预测的类别数，从传入的config中获取
         self.n_classes = config.num_class
-        # 读取模型的配置文件，如果模型路径下有bert_config.json文件，则读取该文件，否则读取config.json文件
-        config_json = 'bert_config.json' if os.path.exists(config.model_path + 'bert_config.json') else 'config.json'
-        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path + config_json,
-                                                                 output_hidden_states=True) # output_hidden_states=True表示输出所有隐藏层的状态
+        # 加载BERT模型的配置，CONFIGS是一个映射，根据传入的模型名字，获取对应的配置类
+        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path)
         # 加载BERT模型，MODELS是一个映射，根据传入的模型名字，获取对应的模型类
-        self.bert_model = MODELS[config.model].from_pretrained(config.model_path, config=self.bert_config)
+        self.bert_model = MODELS[config.model].from_pretrained(config.model_path)
         # 创建了一个线性层，用于计算每个隐藏层状态的动态权重
         self.dynWeight = nn.Linear(self.bert_config.hidden_size, 1)
         # 创建了一个线性层，用于对特征进行降维
@@ -499,12 +475,10 @@ class BertDynEmbeddings(nn.Module):
         super(BertDynEmbeddings, self).__init__()
         # 设置模型需要预测的类别数，从传入的config中获取
         self.n_classes = config.num_class
-        # 读取模型的配置文件，如果模型路径下有bert_config.json文件，则读取该文件，否则读取config.json文件
-        config_json = 'bert_config.json' if os.path.exists(config.model_path + 'bert_config.json') else 'config.json'
-        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path + config_json,
-                                                                 output_hidden_states=True) # output_hidden_states=True表示输出所有隐藏层的状态
+        # 加载BERT模型的配置，CONFIGS是一个映射，根据传入的模型名字，获取对应的配置类
+        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path)
         # 加载BERT模型，MODELS是一个映射，根据传入的模型名字，获取对应的模型类
-        self.bert_model = MODELS[config.model].from_pretrained(config.model_path, config=self.bert_config)
+        self.bert_model = MODELS[config.model].from_pretrained(config.model_path)
         # 创建了一个线性层，用于计算每个隐藏层状态的动态权重
         self.dynWeight = nn.Linear(self.bert_config.hidden_size, 1)
         # 创建了一个线性层，用于对特征进行降维
@@ -572,12 +546,10 @@ class BertRNN(nn.Module):
         self.drop_out = 0.1
         # 设置模型需要预测的类别数，从传入的config中获取
         self.n_classes = config.num_class
-        # 读取模型的配置文件，如果模型路径下有bert_config.json文件，则读取该文件，否则读取config.json文件
-        config_json = 'bert_config.json' if os.path.exists(config.model_path + 'bert_config.json') else 'config.json'
-        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path + config_json,
-                                                                 output_hidden_states=True) # output_hidden_states=True表示输出所有隐藏层的状态
+        # 加载BERT模型的配置，CONFIGS是一个映射，根据传入的模型名字，获取对应的配置类
+        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path)
         # 加载BERT模型，MODELS是一个映射，根据传入的模型名字，获取对应的模型类
-        self.bert_model = MODELS[config.model].from_pretrained(config.model_path, config=self.bert_config)
+        self.bert_model = MODELS[config.model].from_pretrained(config.model_path)
         # 定义是单向还是双向RNN，单向为1，双向为2
         self.num_directions = 1 if not self.bidirectional else 2
 
@@ -665,12 +637,10 @@ class BertRNN(nn.Module):
 class BertCNN(nn.Module):
     def __init__(self, config):
         super(BertCNN, self).__init__()
+        # 加载BERT模型的配置，CONFIGS是一个映射，根据传入的模型名字，获取对应的配置类
+        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path)
         # 设置卷积核的数量
         self.num_filters = 100
-        # 读取模型的配置文件，如果模型路径下有bert_config.json文件，则读取该文件，否则读取config.json文件
-        config_json = 'bert_config.json' if os.path.exists(config.model_path + 'bert_config.json') else 'config.json'
-        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path + config_json,
-                                                                 output_hidden_states=True) # output_hidden_states=True表示输出所有隐藏层的状态
         # hidden_size是BERT的输出维度
         self.hidden_size = self.bert_config.to_dict()['hidden_size']
         # 设置卷积核的大小，使用3、4、5三种大小的卷积核
@@ -681,10 +651,9 @@ class BertCNN(nn.Module):
         # 每个卷积核的输入通道数是1，因为文本特征是一维的，没有深度
         # 每个卷积核的输出通道数是num_filters，卷积核大小是（k，hidden_size）
         self.convs = nn.ModuleList(
-            [nn.Conv2d(1, self.num_filters, (k, self.hidden_size)) for k in self.filter_sizes])
-
+            [nn.Conv2d(1, self.num_filters, (k, self.hidden_size)) for k in self.filter_sizes])        
         # 加载BERT模型，MODELS是一个映射，根据传入的模型名字，获取对应的模型类
-        self.bert_model = MODELS[config.model].from_pretrained(config.model_path, config=self.bert_config)
+        self.bert_model = MODELS[config.model].from_pretrained(config.model_path)
         # 创建了一个dropout层
         self.dropout = nn.Dropout(self.drop_out)
         # 创建了一个线性层，将卷积层的输出拼接在一起，然后进行分类
@@ -735,12 +704,10 @@ class BertRCNN(nn.Module):
         self.drop_out = 0.5
         # 设置模型需要预测的类别数，从传入的config中获取
         self.n_classes = config.num_class
-        # 读取模型的配置文件，如果模型路径下有bert_config.json文件，则读取该文件，否则读取config.json文件
-        config_json = 'bert_config.json' if os.path.exists(config.model_path + 'bert_config.json') else 'config.json'
-        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path + config_json, 
-                                                                 output_hidden_states=True) # output_hidden_states=True表示输出所有隐藏层的状态
+        # 加载BERT模型的配置，CONFIGS是一个映射，根据传入的模型名字，获取对应的配置类
+        self.bert_config = CONFIGS[config.model].from_pretrained(config.model_path)
         # 加载BERT模型，MODELS是一个映射，根据传入的模型名字，获取对应的模型类
-        self.bert_model = MODELS[config.model].from_pretrained(config.model_path, config=self.bert_config)
+        self.bert_model = MODELS[config.model].from_pretrained(config.model_path)
         
         # 根据RNN类型，初始化RNN层
         if self.rnn_type == 'lstm':

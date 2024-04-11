@@ -1,58 +1,47 @@
-import re
 import os
-from collections import Counter
-
 import pandas as pd
-from tqdm import tqdm
+import numpy as np
 
 directory = './result/'
-files = [file for a, b, file in os.walk(directory)][0]
-flag = False
+files = [file for _, _, file in os.walk(directory)][0]
 
+# 初始化结果存储列表
+res = []
 
-def vote(predictions):
-    '''
-    投票融合方法
-    :param predictions:
-    :return:
-    '''
-
-    result = []
-    for tmp in (predictions):
-        counter = Counter(tmp)
-        result.append(counter.most_common()[0][0])
-    return result
-
-
-res = [[] for _ in range(20000)]
-print(res)
-
+# 读取所有预测结果文件
 for file in files:
     tmp = pd.read_csv(directory + file)
-    label = tmp["class_label"].to_list()
-    for i in range(len(label)):
-        res[i].append(label[i])
+    # 假设class_label列的每个元素是以逗号分隔的多个类别
+    labels = tmp["class_label"].apply(lambda x: x.split(','))
+    res.append(labels)
 
+# 获取类别的总数
+num_categories = len(set([label for sublist in res for item in sublist for label in item]))
+# 初始化一个全0的数组，用于存放每个样本每个类别出现的次数
+vote_counts = np.zeros((len(res[0]), num_categories), dtype=int)
 
-result = vote(res)
+# 类别到索引的映射
+category_to_index = {category: index for index, category in enumerate(sorted(set([label for sublist in res for item in sublist for label in item])))}
 
+# 累计每个类别的出现次数
+for labels_list in res:
+    for i, labels in enumerate(labels_list):
+        for label in labels:
+            index = category_to_index[label]
+            vote_counts[i, index] += 1
+
+# 设置阈值为模型数量的一半，表示如果超过半数模型预测为正类，则认为该样本属于该类
+threshold = len(files) // 2
+predicted_labels = []
+
+# 根据阈值判断最终的类别集合
+for i in range(len(vote_counts)):
+    sample_labels = [category for category, index in category_to_index.items() if vote_counts[i, index] > threshold]
+    predicted_labels.append(','.join(sample_labels))
+
+# 读取提交文件模板
 sub = pd.read_csv('data/submit_example.csv')
-sub['class_label'] = result
-def rank_label(label):
-    if label in ["财经","时政"]:
-        return "高风险"
-    elif label in ["房产", "科技"]:
-        return "中风险"
-    elif label in ["教育", "时尚", "游戏"]:
-        return "低风险"
-    elif label in ["家居", "体育", "娱乐"]:
-        return "可公开"
-
-sub['rank_label'] = sub['class_label'].apply(rank_label)
-sub.to_csv("./result——vote.csv", index=False)
-
-
-
-
-
-
+# 将预测结果赋值给class_label列
+sub['class_label'] = predicted_labels
+# 保存最终的预测结果
+sub.to_csv("./result_vote.csv", index=False)
